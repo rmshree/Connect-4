@@ -37,40 +37,159 @@ public class MMAI extends AIModule
         }
         //horizonal 3s
         for(int i=0; i<game.getHeight(); i++){
-            for(int j=0; j<game.getWidth()-2; j++){
-                if(getat[i*6+j]== playerID && getat[i*6+j+1] == playerID && getat[i*6+j+2] == playerID){
+            for(int j=0; j<game.getWidth()-3; j++){
+                int count =0;
+                if(getat[i*6+j]== playerID){
+                    count++;
+                }
+                if(getat[i*6+j+1]== playerID){
+                    count++;
+                }
+                if(getat[i*6+j+2]== playerID){
+                    count++;
+                }
+                if(getat[i*6+j+3]== playerID){
+                    count++;
+                }
+                if(getat[i*6+j]== altPlayer){
+                    count--;
+                }
+                if(getat[i*6+j+1]== altPlayer){
+                    count--;
+                }
+                if(getat[i*6+j+2]== altPlayer){
+                    count--;
+                }
+                if(getat[i*6+j+3]== altPlayer){
+                    count--;
+                }
+
+                if(count == 3){
                     score++;
-                }else if(getat[i*6+j] == altPlayer && getat[i*6+j+1] == altPlayer && getat[i*6+j+2] == altPlayer ){
+                }else if(count == -3){
                     score--;
                 }
             }
         }
         //vertical 3s
-        for(int i=0; i<game.getWidth(); i++){
-            for(int j=0; j<game.getHeight()-2; j++){
-                if(getat[i*6+j] == playerID && getat[(i+1)*6+j] == playerID && getat[(i+2)*6+j] == playerID){
+        for(int i=0; i<game.getHeight()-3; i++){
+            for(int j=0; j<game.getWidth(); j++){
+//                if(getat[i*6+j] == playerID && getat[(i+1)*6+j] == playerID && getat[(i+2)*6+j] == playerID){
+//                    score++;
+//                }else if(getat[i*6+j] == altPlayer && getat[(i+1)*6+j] == altPlayer && getat[(i+2)*6+j] == altPlayer){
+//                    score--;
+//                }
+                int count =0;
+                if(getat[i*6+j]== playerID){
+                    count++;
+                }
+                if(getat[(i+1)*6+j]== playerID){
+                    count++;
+                }
+                if(getat[(i+2)*6+j]== playerID){
+                    count++;
+                }
+                if(getat[(i+3)*6+j]== playerID){
+                    count++;
+                }
+                if(getat[i*6+j]== altPlayer){
+                    count--;
+                }
+                if(getat[(i+1)*6+j]== altPlayer){
+                    count--;
+                }
+                if(getat[(i+2)*6+j]== altPlayer){
+                    count--;
+                }
+                if(getat[(i+3)*6+j]== altPlayer){
+                    count--;
+                }
+
+                if(count == 3){
                     score++;
-                }else if(getat[i*6+j] == altPlayer && getat[(i+1)*6+j] == altPlayer && getat[(i+2)*6+j] == altPlayer){
+                }else if(count == -3){
                     score--;
                 }
             }
         }
         //diagonal bot left to top right 3s
-        for(int i=0; i<game.getWidth()-2; i++) {
-            for (int j = 0; j < game.getHeight() - 2; j++) {
-                if (getat[i*6+j] == playerID && getat[(i+1)*6+j+1] == playerID && getat[(i+2)*6+j+2] == playerID) {
+        for(int i=0; i<game.getHeight()-3; i++) {
+            for (int j = 0; j < game.getWidth() - 3; j++) {
+//                if (getat[i*6+j] == playerID && getat[(i+1)*6+j+1] == playerID && getat[(i+2)*6+j+2] == playerID) {
+//                    score++;
+//                } else if (getat[i*6+j] == altPlayer && getat[(i+1)*6+j+1]  == altPlayer && getat[(i+2)*6+j+2] == altPlayer)  {
+//                    score--;
+//                }
+                int count =0;
+                if(getat[i*6+j]== playerID){
+                    count++;
+                }
+                if(getat[(i+1)*6+j+1]== playerID){
+                    count++;
+                }
+                if(getat[(i+2)*6+j+2]== playerID){
+                    count++;
+                }
+                if(getat[(i+3)*6+j+3]== playerID){
+                    count++;
+                }
+                if(getat[i*6+j]== altPlayer){
+                    count--;
+                }
+                if(getat[(i+1)*6+j+1]== altPlayer){
+                    count--;
+                }
+                if(getat[(i+2)*6+j+2]== altPlayer){
+                    count--;
+                }
+                if(getat[(i+3)*6+j+3]== altPlayer){
+                    count--;
+                }
+
+                if(count == 3){
                     score++;
-                } else if (getat[i*6+j] == altPlayer && getat[(i+1)*6+j+1]  == altPlayer && getat[(i+2)*6+j+2] == altPlayer)  {
+                }else if(count == -3){
                     score--;
                 }
             }
         }
         //diagonal bot right to top left 3s
-        for(int i=2; i<game.getWidth(); i++) {
-            for (int j = 0; j < game.getHeight() - 2; j++) {
-                if (getat[i*6+j] == playerID && getat[(i-1)*6+j+1]  == playerID && getat[(i-2)*6+j+2] == playerID) {
+        for(int i=3; i<game.getHeight(); i++) {
+            for (int j = 0; j < game.getWidth() - 3; j++) {
+//                if (getat[i*6+j] == playerID && getat[(i-1)*6+j+1]  == playerID && getat[(i-2)*6+j+2] == playerID) {
+//                    score++;
+//                } else if (getat[i*6+j] == altPlayer && getat[(i-1)*6+j+1]== altPlayer && getat[(i-2)*6+j+2] == altPlayer) {
+//                    score--;
+//                }
+                int count =0;
+                if(getat[i*6+j]== playerID){
+                    count++;
+                }
+                if(getat[(i-1)*6+j+1]== playerID){
+                    count++;
+                }
+                if(getat[(i-2)*6+j+2]== playerID){
+                    count++;
+                }
+                if(getat[(i-3)*6+j+3]== playerID){
+                    count++;
+                }
+                if(getat[i*6+j]== altPlayer){
+                    count--;
+                }
+                if(getat[(i-1)*6+j+1]== altPlayer){
+                    count--;
+                }
+                if(getat[(i-2)*6+j+2]== altPlayer){
+                    count--;
+                }
+                if(getat[(i-3)*6+j+3]== altPlayer){
+                    count--;
+                }
+
+                if(count == 3){
                     score++;
-                } else if (getat[i*6+j] == altPlayer && getat[(i-1)*6+j+1]== altPlayer && getat[(i-2)*6+j+2] == altPlayer) {
+                }else if(count == -3){
                     score--;
                 }
             }
@@ -93,8 +212,11 @@ public class MMAI extends AIModule
             GameStateModule game2 = game.copy();
             if (game.canMakeMove(i)) {
                 game2.makeMove(i);
-                int mm = minmax(game2, 8, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, game.getActivePlayer(), getZHash(game2));
+                int mm = minmax(game2, 9, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, game.getActivePlayer(), getZHash(game2));
                 if(mm > bestScore){
+                    bestScore = mm;
+                    chosenMove = i;
+                }else if(mm == bestScore && i == 3){
                     bestScore = mm;
                     chosenMove = i;
                 }
