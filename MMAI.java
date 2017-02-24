@@ -11,6 +11,8 @@ public class MMAI extends AIModule
 {
 
     HashMap<Long, Integer> transpositionTable;
+    HashMap<Long, Integer> orderingTable;
+    boolean first;
 
     public int eval(final GameStateModule game, int playerID){
         int altPlayer;
@@ -189,6 +191,7 @@ public class MMAI extends AIModule
         startTime = System.nanoTime();
         finishThreshold = 499000000;
         int bestScore = Integer.MIN_VALUE;
+        first = true;
 
         zobrist = new long[7][6][2];
         Random randomno = new Random();
@@ -198,7 +201,7 @@ public class MMAI extends AIModule
                 zobrist[j][i][1] = randomno.nextLong();
             }
         }
-        int depth = 8;
+        int depth = 9;
         int nextChosen = 0;
 
         while(System.nanoTime() - startTime < finishThreshold && depth < 42) {
@@ -224,11 +227,14 @@ public class MMAI extends AIModule
                 }
                 if(!(System.nanoTime()-startTime<finishThreshold)){
                     done = false;
+//                    System.out.print("failed to do "+depth+"\n");
                 }
             }
             if(done) {
                 chosenMove = nextChosen;
             }
+            orderingTable = transpositionTable;//remember the table to do ordering at the next depth!
+            first = false;
             depth++;
 
         }
@@ -269,7 +275,17 @@ public class MMAI extends AIModule
                 double score;
                 if(game.canMakeMove(i)) {
                     child.makeMove(i);
-                    score = eval(game, Pid);
+                    if(first) {
+                        score = eval(child, Pid);
+                    }else{
+                        int y = game.getHeightAt(i);
+                        long newkey = updateZkey(curZkey, i, y, child.getAt(i, y) - 1);
+                        if(orderingTable.containsKey(newkey)) {
+                            score = orderingTable.get(newkey);//sort based on the last depth search
+                        }else{
+                            score = eval(child, Pid);
+                        }
+                    }
                 }else{
                     score = (double)Integer.MIN_VALUE;
                 }
@@ -282,10 +298,9 @@ public class MMAI extends AIModule
             }
             Arrays.sort(orderedMove);
             ArrayList<Integer> moves = new ArrayList<>();
-            for(int i=game.getWidth()-1; i>0; i--){
+            for(int i=game.getWidth()-1; i>=0; i--){
                 moves.add(map.get(orderedMove[i]));
             }
-
             for(int i : moves) {
                 if(game.canMakeMove(i)) {
                     GameStateModule child = game.copy();
@@ -319,7 +334,17 @@ public class MMAI extends AIModule
                 double score;
                 if(game.canMakeMove(i)) {
                     child.makeMove(i);
-                    score = eval(game, Pid);
+                    if(first) {
+                        score = eval(child, Pid);
+                    }else{
+                        int y = game.getHeightAt(i);
+                        long newkey = updateZkey(curZkey, i, y, child.getAt(i, y) - 1);
+                        if(orderingTable.containsKey(newkey)) {
+                            score = orderingTable.get(newkey);//sort based on the last depth search
+                        }else{
+                            score = eval(child, Pid);
+                        }
+                    }
                 }else{
                     score = (double)Integer.MIN_VALUE;
                 }
