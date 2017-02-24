@@ -74,11 +74,6 @@ public class MMAI extends AIModule
         //vertical 3s
         for(int i=0; i<game.getHeight()-3; i++){
             for(int j=0; j<game.getWidth(); j++){
-//                if(getat[i*6+j] == playerID && getat[(i+1)*6+j] == playerID && getat[(i+2)*6+j] == playerID){
-//                    score++;
-//                }else if(getat[i*6+j] == altPlayer && getat[(i+1)*6+j] == altPlayer && getat[(i+2)*6+j] == altPlayer){
-//                    score--;
-//                }
                 int count =0;
                 if(getat[i*6+j]== playerID){
                     count++;
@@ -115,11 +110,6 @@ public class MMAI extends AIModule
         //diagonal bot left to top right 3s
         for(int i=0; i<game.getHeight()-3; i++) {
             for (int j = 0; j < game.getWidth() - 3; j++) {
-//                if (getat[i*6+j] == playerID && getat[(i+1)*6+j+1] == playerID && getat[(i+2)*6+j+2] == playerID) {
-//                    score++;
-//                } else if (getat[i*6+j] == altPlayer && getat[(i+1)*6+j+1]  == altPlayer && getat[(i+2)*6+j+2] == altPlayer)  {
-//                    score--;
-//                }
                 int count =0;
                 if(getat[i*6+j]== playerID){
                     count++;
@@ -156,11 +146,6 @@ public class MMAI extends AIModule
         //diagonal bot right to top left 3s
         for(int i=3; i<game.getHeight(); i++) {
             for (int j = 0; j < game.getWidth() - 3; j++) {
-//                if (getat[i*6+j] == playerID && getat[(i-1)*6+j+1]  == playerID && getat[(i-2)*6+j+2] == playerID) {
-//                    score++;
-//                } else if (getat[i*6+j] == altPlayer && getat[(i-1)*6+j+1]== altPlayer && getat[(i-2)*6+j+2] == altPlayer) {
-//                    score--;
-//                }
                 int count =0;
                 if(getat[i*6+j]== playerID){
                     count++;
@@ -197,30 +182,55 @@ public class MMAI extends AIModule
         return score;
     }
     long[][][] zobrist;
+    long startTime;
+    long finishThreshold;
     public void getNextMove(final GameStateModule game)
     {
+        startTime = System.nanoTime();
+        finishThreshold = 499000000;
         int bestScore = Integer.MIN_VALUE;
-        transpositionTable = new HashMap<Long, Integer>();
+
         zobrist = new long[7][6][2];
         Random randomno = new Random();
-        for(int i=0; i<6; i++)
-            for(int j=0; j<7; j++) {
+        for(int i=0; i<6; i++) {
+            for (int j = 0; j < 7; j++) {
                 zobrist[j][i][0] = randomno.nextLong();
                 zobrist[j][i][1] = randomno.nextLong();
             }
-        for(int i = 0; i < game.getWidth(); i++) {
-            GameStateModule game2 = game.copy();
-            if (game.canMakeMove(i)) {
-                game2.makeMove(i);
-                int mm = minmax(game2, 9, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, game.getActivePlayer(), getZHash(game2));
-                if(mm > bestScore){
-                    bestScore = mm;
-                    chosenMove = i;
-                }else if(mm == bestScore && i == 3){
-                    bestScore = mm;
-                    chosenMove = i;
+        }
+        int depth = 8;
+        int nextChosen = 0;
+
+        while(System.nanoTime() - startTime < finishThreshold && depth < 42) {
+            transpositionTable = new HashMap<Long, Integer>();//reset table for next depth
+//            System.out.print("trying "+depth+"\n");
+            boolean done = true;
+            for (int i = 0; i < game.getWidth(); i++) {
+                GameStateModule game2 = game.copy();
+                if (game.canMakeMove(i) && System.nanoTime()-startTime<finishThreshold) {
+                    game2.makeMove(i);
+                    int mm = minmax(game2, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, game.getActivePlayer(), getZHash(game2));
+                    if (mm > bestScore) {
+                        bestScore = mm;
+                        nextChosen = i;
+                    } else if (mm == bestScore && i == 3) {
+                        bestScore = mm;
+                        nextChosen = i;
+                    }
+                    if(mm == Integer.MAX_VALUE){
+                        chosenMove = i;
+                        return;//if we can win, do so and finish the game
+                    }
+                }
+                if(!(System.nanoTime()-startTime<finishThreshold)){
+                    done = false;
                 }
             }
+            if(done) {
+                chosenMove = nextChosen;
+            }
+            depth++;
+
         }
     }
 
@@ -242,21 +252,47 @@ public class MMAI extends AIModule
     }
 
     public int minmax(GameStateModule game, int depth, int alpha, int beta, int maxPlayer, int Pid, long curZkey){
+        if(!(System.nanoTime() - startTime < finishThreshold)){
+            return 0;
+        }
 
         if(depth == 0 || game.isGameOver()){
             return eval(game, Pid);
         }
         if(maxPlayer == 1){
             int bestVal = Integer.MIN_VALUE;
-            for(int i = 0; i < game.getWidth(); i++) {
+            double[] orderedMove = new double[game.getWidth()];
+            HashMap<Double, Integer> map = new HashMap<>();
+            ArrayList<Double> scores = new ArrayList<>();
+            for(int i=0; i < game.getWidth(); i++) {
+                GameStateModule child = game.copy();
+                double score;
+                if(game.canMakeMove(i)) {
+                    child.makeMove(i);
+                    score = eval(game, Pid);
+                }else{
+                    score = (double)Integer.MIN_VALUE;
+                }
+                while(scores.contains(score)){
+                    score+=0.1;//make them unique
+                }
+                map.put(score,i);
+                orderedMove[i] = score;
+                scores.add(score);
+            }
+            Arrays.sort(orderedMove);
+            ArrayList<Integer> moves = new ArrayList<>();
+            for(int i=game.getWidth()-1; i>0; i--){
+                moves.add(map.get(orderedMove[i]));
+            }
+
+            for(int i : moves) {
                 if(game.canMakeMove(i)) {
                     GameStateModule child = game.copy();
-
                     child.makeMove(i);
                     int y = game.getHeightAt(i);
-                    // the move just make is at i,y
+                    // the move just made is at i,y
                     curZkey = updateZkey(curZkey, i, y, child.getAt(i,y)-1);
-//                    curZkey = getZHash(child);
                     int v;
                     if(transpositionTable.containsKey(curZkey)){
                         v = transpositionTable.get(curZkey);
@@ -275,14 +311,38 @@ public class MMAI extends AIModule
             return bestVal;
         }else{
             int bestVal = Integer.MAX_VALUE;
-            for(int i = 0; i < game.getWidth(); i++) {
+            double[] orderedMove = new double[game.getWidth()];
+            HashMap<Double, Integer> map = new HashMap<>();
+            ArrayList<Double> scores = new ArrayList<>();
+            for(int i=0; i < game.getWidth(); i++) {
+                GameStateModule child = game.copy();
+                double score;
+                if(game.canMakeMove(i)) {
+                    child.makeMove(i);
+                    score = eval(game, Pid);
+                }else{
+                    score = (double)Integer.MIN_VALUE;
+                }
+                while(scores.contains(score)){
+                    score+=0.1;//make them unique
+                }
+                map.put(score,i);
+                orderedMove[i] = score;
+                scores.add(score);
+            }
+            Arrays.sort(orderedMove);
+            ArrayList<Integer> moves = new ArrayList<>();
+            for(int i=0; i<game.getWidth(); i++){
+                moves.add(map.get(orderedMove[i]));
+            }
+
+            for(int i : moves) {
                 if(game.canMakeMove(i)) {
                     GameStateModule child = game.copy();
                     child.makeMove(i);
-                    int y = game.getHeightAt(i);// the move just make is at i,y
+                    int y = game.getHeightAt(i);// the move just made is at i,y
                     int v;
                     curZkey = updateZkey(curZkey, i, y, child.getAt(i,y)-1);
-//                    curZkey = getZHash(child);
                     if(transpositionTable.containsKey(curZkey)){
                         v = transpositionTable.get(curZkey);
                     }else{
