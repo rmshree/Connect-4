@@ -201,7 +201,7 @@ public class MMAI extends AIModule
                 zobrist[j][i][1] = randomno.nextLong();
             }
         }
-        int depth = 9;
+        int depth = 8;
         int nextChosen = 0;
 
         while(System.nanoTime() - startTime < finishThreshold && depth < 42) {
