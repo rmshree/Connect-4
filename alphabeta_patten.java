@@ -1,13 +1,12 @@
-import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Random;
-import java.util.*;
 
 /**
  * Created by rhyspatten on 18/02/17.
  */
-public class MMAI extends AIModule
+public class alphabeta_patten extends AIModule
 {
 
     HashMap<Long, Integer> transpositionTable;
@@ -37,7 +36,7 @@ public class MMAI extends AIModule
                 getat[i*6+j] = game.getAt(j,i);
             }
         }
-        //horizonal 3s
+        //horizontal 3s
         for(int i=0; i<game.getHeight(); i++){
             for(int j=0; j<game.getWidth()-3; j++){
                 int count =0;
@@ -189,7 +188,7 @@ public class MMAI extends AIModule
     public void getNextMove(final GameStateModule game)
     {
         startTime = System.nanoTime();
-        finishThreshold = 499000000;
+        finishThreshold = 499000000; //get it as close to 500ms as possible
         int bestScore = Integer.MIN_VALUE;
         first = true;
 

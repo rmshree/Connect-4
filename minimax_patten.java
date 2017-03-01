@@ -1,13 +1,7 @@
-import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Random;
-import java.util.*;
-
 /**
  * Created by rhyspatten on 18/02/17.
  */
-public class minimxteamname extends AIModule
+public class minimax_patten extends AIModule
 {
 
     public int eval(final GameStateModule game, int playerID){
@@ -179,8 +173,12 @@ public class minimxteamname extends AIModule
         }
         return score;
     }
+    long startTime;
+    long finishThreshold;
     public void getNextMove(final GameStateModule game)
     {
+        startTime = System.nanoTime();
+        finishThreshold = 499000000; //get it as close to 500ms as possible
         int bestScore = Integer.MIN_VALUE;
 
         int depth = 6;
@@ -203,6 +201,9 @@ public class minimxteamname extends AIModule
 
 
     public int minmax(GameStateModule game, int depth, int maxPlayer, int Pid){
+        if(!(System.nanoTime() - startTime < finishThreshold)){
+            return 0;
+        }
         if(depth == 0 || game.isGameOver()){
             return eval(game, Pid);
         }
