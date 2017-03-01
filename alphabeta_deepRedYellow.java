@@ -6,7 +6,7 @@ import java.util.Random;
 /**
  * Created by rhyspatten on 18/02/17.
  */
-public class alphabeta_patten extends AIModule
+public class alphabeta_deepRedYellow extends AIModule
 {
 
     HashMap<Long, Integer> transpositionTable;

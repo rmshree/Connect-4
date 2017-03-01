@@ -1,7 +1,7 @@
 /**
  * Created by rhyspatten on 18/02/17.
  */
-public class minimax_patten extends AIModule
+public class minimax_deepRedYellow extends AIModule
 {
 
     public int eval(final GameStateModule game, int playerID){
